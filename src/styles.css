@@ -97,10 +97,13 @@ input:focus {
   padding: 0;
   /* No padding allowed for alignment */
   color: #121212;
-  vertical-align: baseline;
+  vertical-align: middle;
   /* Use parent font size to ensure 1ch matches the textarea exactly */
   font-size: inherit;
-  line-height: inherit;
+  line-height: 1;
+  height: 1.1em;
+  margin-top: -0.1em;
+  /* Slight adjustment to center visually */
   overflow: hidden;
 }
 

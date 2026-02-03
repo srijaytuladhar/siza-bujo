@@ -10,12 +10,7 @@ import { LogService, LogEntry } from './services/log.service';
   template: `
     <div class="container">
       <header>
-        <div class="date-nav">
-          <button (click)="changeDate(-1)">&lt;</button>
-          <span class="current-date">{{ currentDate() }}</span>
-          <button (click)="changeDate(1)">&gt;</button>
-          <button (click)="goToToday()" *ngIf="currentDate() !== today">Today</button>
-        </div>
+        <div class="logo">BuJo</div>
         <div class="search-box">
           <input 
             type="text" 
@@ -52,7 +47,7 @@ x done"
           No matches found for "{{ searchQuery() }}"
         </div>
         <div class="result-item" *ngFor="let result of searchResults()">
-          <div class="result-date" (click)="goToDate(result.date)">{{ result.date }}</div>
+          <div class="result-date">Match found in Log</div>
           <pre class="result-content">{{ result.content }}</pre>
         </div>
       </section>
@@ -81,15 +76,11 @@ x done"
       padding-bottom: 1rem;
     }
 
-    .date-nav {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .current-date {
+    .logo {
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: var(--chip-task);
     }
 
     button {
@@ -166,11 +157,9 @@ x done"
 export class App {
   private logService = inject(LogService);
 
-  today = this.logService.getToday();
-  currentDate = signal<string>(this.today);
   editorContent = signal<string>('');
   searchQuery = signal<string>('');
-  searchResults = signal<LogEntry[]>([]);
+  searchResults = signal<any[]>([]);
 
   highlightedContent = computed(() => {
     let content = this.editorContent();
@@ -217,31 +206,13 @@ export class App {
   });
 
   constructor() {
-    // Load initial content
-    effect(() => {
-      const content = this.logService.getLogByDate(this.currentDate());
-      this.editorContent.set(content);
-    }, { allowSignalWrites: true });
+    // Load initial content from master log
+    this.editorContent.set(this.logService.getMasterLog());
   }
 
   onContentChange(newContent: string) {
     this.editorContent.set(newContent);
-    this.logService.saveLog(this.currentDate(), newContent);
-  }
-
-  changeDate(delta: number) {
-    const date = new Date(this.currentDate());
-    date.setDate(date.getDate() + delta);
-    this.currentDate.set(date.toISOString().split('T')[0]);
-  }
-
-  goToToday() {
-    this.currentDate.set(this.today);
-  }
-
-  goToDate(date: string) {
-    this.currentDate.set(date);
-    this.searchQuery.set('');
+    this.logService.saveMasterLog(newContent);
   }
 
   performSearch() {
