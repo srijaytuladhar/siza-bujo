@@ -11,13 +11,20 @@ import { LogService, LogEntry } from './services/log.service';
     <div class="container">
       <header>
         <div class="logo">BuJo</div>
-        <div class="search-box">
-          <input 
-            type="text" 
-            [(ngModel)]="searchQuery" 
-            placeholder="Search entries..."
-            (input)="performSearch()"
-          >
+        <div class="header-actions">
+          <div class="storage-nav">
+            <button class="btn-storage" (click)="selectStorageFolder()">
+              {{ isFileStorage() ? '📁 ' + folderName() : '☁️ Local' }}
+            </button>
+          </div>
+          <div class="search-box">
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery" 
+              placeholder="Search entries..."
+              (input)="performSearch()"
+            >
+          </div>
         </div>
       </header>
 
@@ -74,6 +81,30 @@ x done"
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .btn-storage {
+      font-size: 0.85rem;
+      color: var(--secondary-text);
+      border-color: var(--border-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-storage:hover {
+      color: var(--text-color);
+      border-color: var(--secondary-text);
     }
 
     .logo {
@@ -160,6 +191,8 @@ export class App {
   editorContent = signal<string>('');
   searchQuery = signal<string>('');
   searchResults = signal<any[]>([]);
+  folderName = signal<string>('');
+  isFileStorage = signal<boolean>(false);
 
   highlightedContent = computed(() => {
     let content = this.editorContent();
@@ -214,6 +247,31 @@ export class App {
   constructor() {
     // Load initial content from master log
     this.editorContent.set(this.logService.getMasterLog());
+    this.refreshStorageStatus();
+  }
+
+  async refreshStorageStatus() {
+    const handle = await this.logService.getFolderHandle();
+    if (handle) {
+      this.folderName.set(handle.name);
+      this.isFileStorage.set(true);
+      // If we have a folder, load content from it (it might be newer)
+      const content = await this.logService.loadFromFolder();
+      if (content !== null) {
+        this.editorContent.set(content);
+      }
+    } else {
+      this.isFileStorage.set(false);
+    }
+  }
+
+  async selectStorageFolder() {
+    try {
+      await this.logService.selectFolder();
+      await this.refreshStorageStatus();
+    } catch (e) {
+      console.error('Folder selection failed', e);
+    }
   }
 
   onContentChange(newContent: string) {
