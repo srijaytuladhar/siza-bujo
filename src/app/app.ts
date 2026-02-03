@@ -176,7 +176,7 @@ export class App {
       if (!trimmed) return '<div class="bujo-line">&nbsp;</div>';
 
       const firstChar = trimmed[0];
-      const symbols = ['.', '-', '>', 'x', 'o', '→', '='];
+      const symbols = ['.', '-', '>', 'x', 'o', '→', '=', '#'];
 
       let chipHTML = '';
       let lineClass = '';
@@ -191,12 +191,18 @@ export class App {
           case '>': chipClass = 'chip-migrate'; lineClass = 'line-migrate'; break;
           case 'o': chipClass = 'chip-event'; lineClass = 'line-event'; break;
           case '=': chipClass = 'chip-feeling'; lineClass = 'line-feeling'; break;
+          case '#': chipClass = 'chip-header'; lineClass = 'line-header'; break;
         }
 
         const symbolIdx = line.indexOf(firstChar);
         const prefix = escape(line.substring(0, symbolIdx));
         const rest = escape(line.substring(symbolIdx + 1));
-        chipHTML = `${prefix}<span class="chip ${chipClass}">${firstChar}</span>${rest}`;
+
+        if (firstChar === '#') {
+          chipHTML = `${prefix}<span class="chip ${chipClass}">${firstChar}</span><span class="header-text">${rest}</span>`;
+        } else {
+          chipHTML = `${prefix}<span class="chip ${chipClass}">${firstChar}</span>${rest}`;
+        }
       } else {
         chipHTML = escape(line);
       }

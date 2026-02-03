@@ -16,6 +16,7 @@
   --chip-event: #4dd0e1;
   --chip-feeling: #f06292;
   --chip-done: #81c784;
+  --chip-header: #ffffff;
 }
 
 body {
@@ -137,6 +138,20 @@ input:focus {
   background-color: rgba(129, 199, 132, 0.15);
 }
 
+.line-header {
+  border-bottom: 1px solid rgba(187, 134, 252, 0.2);
+}
+
+.header-text {
+  font-size: 1.15em;
+  font-weight: bold;
+  background: linear-gradient(90deg, rgba(187, 134, 252, 0.3) 0%, rgba(18, 18, 18, 0) 100%);
+  padding: 0 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .chip-task {
   background-color: var(--chip-task);
 }
@@ -159,4 +174,36 @@ input:focus {
 
 .chip-done {
   background-color: var(--chip-done);
+}
+
+.chip-header {
+  background-color: var(--chip-header);
+  color: #121212;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-left: 1px solid var(--border-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 5px;
+  border: 2px solid var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-text);
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) var(--bg-color);
 }
